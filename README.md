@@ -27,10 +27,10 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
-Running `python -m ado_task_manager.cli --help` will confirm the CLI is available.
+Running `python3 -m ado_task_manager.cli --help` will confirm the CLI is available.
 
 ```bash
-python -m ado_task_manager.cli --help
+python3 -m ado_task_manager.cli --help
 ```
 
 ## CLI usage
@@ -38,16 +38,16 @@ python -m ado_task_manager.cli --help
 ```bash
 source .venv/bin/activate
 # Fetch a task
-python -m ado_task_manager.cli fetch --id 123
+python3 -m ado_task_manager.cli fetch --id 123
 
 # Fetch my tasks
-python -m ado_task_manager.cli mine
+python3 -m ado_task_manager.cli mine
 
 # Fetch child tasks
-python -m ado_task_manager.cli children --id 123
+python3 -m ado_task_manager.cli children --id 123
 
 # Create a task
-python -m ado_task_manager.cli create --title "New Task" --parent-id 123 --description "Description"
+python3 -m ado_task_manager.cli create --title "New Task" --parent-id 123 --description "Description"
 ```
 
 ## MCP server
@@ -90,7 +90,7 @@ Some MCP clients accept explicit stdio configurations:
 {
   "mcpServers": {
     "ado-task-manager": {
-      "command": "python",
+      "command": "python3",
       "args": [
         "-m",
         "ado_task_manager.server"

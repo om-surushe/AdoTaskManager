@@ -35,16 +35,16 @@ fi
 cd "${REPO_ROOT}"
 
 echo "[publish] Upgrading pip and installing build dependencies"
-python -m pip install --upgrade pip
-python -m pip install build twine
+python3 -m pip install --upgrade pip
+python3 -m pip install build twine
 
 if [[ "${INSTALL_PROJECT:-true}" == "true" ]]; then
   echo "[publish] Installing project in editable mode"
-  python -m pip install -e .
+  python3 -m pip install -e .
 fi
 
 echo "[publish] Running static import check"
-python -m compileall src
+python3 -m compileall src
 
 echo "[publish] Cleaning old build artifacts"
 rm -rf dist build
@@ -52,7 +52,7 @@ rm -rf dist build
 mkdir -p dist
 
 echo "[publish] Building source distribution and wheel"
-python -m build
+python3 -m build
 
 if [[ "${PYPI_SKIP_UPLOAD}" == "true" ]]; then
   echo "[publish] PYPI_SKIP_UPLOAD=true; skipping upload"

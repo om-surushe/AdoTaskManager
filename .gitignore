@@ -8,4 +8,5 @@ __pycache__/
 
 # IDE
 .venv
+.venv_test
 .env

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ado-task-manager"
-version = "0.1.2"
+version = "0.1.3"
 description = "Azure DevOps Task Manager MCP"
 authors = [{ name = "Om Surushe" }]
 readme = "README.md"
@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcp = "ado_task_manager.cli:app"
+ado-task-manager = "ado_task_manager.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

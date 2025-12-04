@@ -27,10 +27,10 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
-Running `python3 -m ado_task_manager.cli --help` will confirm the CLI is available.
+Running `ado-task-manager --help` will confirm the CLI is available.
 
 ```bash
-python3 -m ado_task_manager.cli --help
+ado-task-manager --help
 ```
 
 ## CLI usage
@@ -38,16 +38,16 @@ python3 -m ado_task_manager.cli --help
 ```bash
 source .venv/bin/activate
 # Fetch a task
-python3 -m ado_task_manager.cli fetch --id 123
+ado-task-manager fetch --id 123
 
 # Fetch my tasks
-python3 -m ado_task_manager.cli mine
+ado-task-manager mine
 
 # Fetch child tasks
-python3 -m ado_task_manager.cli children --id 123
+ado-task-manager children --id 123
 
 # Create a task
-python3 -m ado_task_manager.cli create --title "New Task" --parent-id 123 --description "Description"
+ado-task-manager create --title "New Task" --parent-id 123 --description "Description"
 ```
 
 ## MCP server

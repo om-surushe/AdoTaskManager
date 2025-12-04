@@ -16,7 +16,6 @@ This document defines the coding standards, patterns, and rules to follow when c
 {root}/
 ├── src/{module_name}/          # All source code
 ├── tests/                       # All test files
-├── .github/workflows/           # CI/CD automation
 ├── scripts/                     # Build/publish scripts
 ├── .env.example                 # Environment template
 ├── .gitignore                   # Git exclusions
@@ -385,11 +384,47 @@ def base_config() -> MCPConfig:
     )
 ```
 
+### Rule 29: Test Coverage
+**MUST** achieve high test coverage:
+- **Goal**: >80% code coverage
+- **Tools**: `pytest-cov`
+- **Command**: `pytest --cov=src/{module_name} tests/`
+
+---
+
+## Quality Assurance Rules
+
+### Rule 30: Pre-commit Hooks
+**MUST** use `pre-commit` to ensure code quality before committing:
+- **Formatter**: `black`
+- **Linter**: `flake8`
+- **Checks**: Trailing whitespace, end of file fixer, YAML check
+
+**Configuration** (`.pre-commit-config.yaml`):
+```yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+```
+
 ---
 
 ## Documentation Rules
 
-### Rule 29: README Structure
+### Rule 31: README Structure
 **MUST** include these sections in README.md:
 1. Project description
 2. Requirements
@@ -400,7 +435,7 @@ def base_config() -> MCPConfig:
 7. MCP client registration examples
 8. Environment variables reference
 
-### Rule 30: Installation Instructions
+### Rule 32: Installation Instructions
 **MUST** provide both venv and uv installation paths:
 ```markdown
 ### Local development
@@ -420,7 +455,7 @@ uv pip install -e .
 ```
 ```
 
-### Rule 31: MCP Client Examples
+### Rule 33: MCP Client Examples
 **MUST** provide configuration examples for:
 - Manual stdio configuration (JSON)
 - MCP Inspector usage
@@ -428,25 +463,7 @@ uv pip install -e .
 
 ---
 
-## CI/CD Rules
-
-### Rule 32: GitHub Actions Workflow
-**MUST** include these jobs:
-1. **tests**: Run static checks, unit tests
-2. **build**: Build sdist and wheel
-3. **publish-testpypi**: Publish to TestPyPI on main branch
-4. **publish-pypi**: Publish to PyPI on version tags
-
-### Rule 33: Trusted Publishing
-**SHOULD** use Trusted Publishing (OIDC) instead of API tokens:
-```yaml
-permissions:
-  contents: read
-  id-token: write
-environment:
-  name: pypi
-  url: https://pypi.org/p/{package-name}
-```
+## Publishing Rules
 
 ### Rule 34: Version Tagging
 **MUST** use semantic versioning with `v` prefix:
@@ -487,13 +504,13 @@ requires-python = ">=3.10"
 ## Naming Conventions
 
 ### Rule 38: Package Names
-- **PyPI package**: kebab-case (e.g., `ado-review-lens`)
-- **Python module**: snake_case (e.g., `ado_review_lens`)
-- **MCP server name**: PascalCase (e.g., `AdoReviewLens`)
+- **PyPI package**: kebab-case (e.g., `ado-task-manager`)
+- **Python module**: snake_case (e.g., `ado_task_manager`)
+- **MCP server name**: PascalCase (e.g., `AdoTaskManager`)
 
 ### Rule 39: File Names
 - **Modules**: snake_case (e.g., `service.py`, `azure_client.py`)
-- **Tests**: `test_{module}.py` (e.g., `test_resolver.py`)
+- **Tests**: `test_{module}.py` (e.g., `test_server.py`)
 - **Scripts**: kebab-case (e.g., `publish.sh`)
 
 ### Rule 40: Function/Variable Names
@@ -566,6 +583,11 @@ __pycache__/
 *.egg-info/
 .venv/
 .env
+dist/
+build/
+.coverage
+htmlcov/
+.pytest_cache/
 ```
 
 ### Rule 46: Commit Messages
@@ -591,9 +613,10 @@ Before considering an MCP server complete, verify:
 - [ ] HTTP client uses context manager pattern
 - [ ] MCP tools return dictionaries
 - [ ] Tests written for core logic
+- [ ] **Test coverage is >80%**
+- [ ] **Pre-commit hooks configured and passing**
 - [ ] README includes all required sections
-- [ ] GitHub Actions workflow configured
-- [ ] `.gitignore` excludes sensitive files
+- [ ] `.gitignore` excludes sensitive files and build artifacts
 - [ ] No secrets hardcoded in source
 - [ ] Package metadata complete in `pyproject.toml`
 - [ ] `server.json` properly configured
@@ -603,14 +626,15 @@ Before considering an MCP server complete, verify:
 ## Reference Implementation
 
 For a complete reference implementation following all these rules, see:
-- **AdoReviewLens**: `/home/om-surushe/Documents/AdoReviewLens`
+- **AdoTaskManager**: `/home/om-surushe/Documents/AdoTaskManager`
 
 Study the following files for patterns:
-- `src/ado_review_lens/server.py` - MCP server structure
-- `src/ado_review_lens/models.py` - Pydantic model patterns
-- `src/ado_review_lens/errors.py` - Exception hierarchy
-- `src/ado_review_lens/config.py` - Configuration loading
-- `src/ado_review_lens/azure.py` - API client pattern
-- `src/ado_review_lens/service.py` - Business logic layer
-- `tests/test_resolver.py` - Testing patterns
-- `.github/workflows/ci.yml` - CI/CD setup
+- `src/ado_task_manager/server.py` - MCP server structure
+- `src/ado_task_manager/models.py` - Pydantic model patterns
+- `src/ado_task_manager/errors.py` - Exception hierarchy
+- `src/ado_task_manager/config.py` - Configuration loading
+- `src/ado_task_manager/client.py` - API client pattern
+- `src/ado_task_manager/service.py` - Business logic layer
+- `src/ado_task_manager/cli.py` - CLI implementation
+- `tests/test_server.py` - Testing patterns
+- `.pre-commit-config.yaml` - Quality checks

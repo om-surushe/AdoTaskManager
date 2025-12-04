@@ -38,9 +38,6 @@ Based on AdoReviewLens template, plan these components:
 Create the following structure in the **root directory**:
 ```
 .
-├── .github/
-│   └── workflows/
-│       └── ci.yml
 ├── src/
 │   └── {module_name}/
 │       ├── __init__.py
@@ -134,6 +131,16 @@ __pycache__/
 # IDE
 .venv
 .env
+
+# Build artifacts
+dist/
+build/
+*.spec
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
 ```
 
 **.env.example** - Document all required environment variables:
@@ -150,7 +157,38 @@ SERVICE_DEFAULT_PARAM=default-value
 
 ## Phase 3: Core Implementation
 
-### 6. Implement Error Classes (`errors.py`)
+### 6. Setup Quality Tools
+Create `.pre-commit-config.yaml` in the root directory:
+```yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+```
+
+Install hooks:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+---
+
+## Phase 3: Core Implementation
+
+### 7. Implement Error Classes (`errors.py`)
 Define custom exceptions following the pattern:
 ```python
 """Custom exceptions for the {ServerName} MCP."""
@@ -178,7 +216,7 @@ class MissingConfigurationError(RuntimeError):
     """Raised when required environment configuration is missing."""
 ```
 
-### 7. Implement Data Models (`models.py`)
+### 8. Implement Data Models (`models.py`)
 Use Pydantic with these conventions:
 - Enable `populate_by_name=True` for camelCase/snake_case flexibility
 - Use `Field(alias="camelCase")` for external API compatibility
@@ -215,7 +253,7 @@ class ResponseModel(BaseModel):
     # Add more fields as needed
 ```
 
-### 8. Implement Configuration Loader (`config.py`)
+### 9. Implement Configuration Loader (`config.py`)
 Load and validate environment variables:
 ```python
 """Configuration helpers for {ServerName} MCP."""
@@ -252,7 +290,7 @@ def load_config() -> MCPConfig:
     )
 ```
 
-### 9. Implement API Client (`{client}.py`)
+### 10. Implement API Client (`{client}.py`)
 Create a client class for the external service:
 - Use context manager pattern (`__enter__`, `__exit__`)
 - Centralize authentication headers
@@ -303,14 +341,14 @@ class {Service}Client:
         return response.json()
 ```
 
-### 10. Implement Service Layer (`service.py`)
+### 11. Implement Service Layer (`service.py`)
 Business logic that orchestrates client calls and data transformation:
 - Keep functions pure and testable
 - Handle pagination if needed
 - Transform external API responses to internal models
 - Filter and normalize data
 
-### 11. Implement MCP Server (`server.py`)
+### 12. Implement MCP Server (`server.py`)
 The main MCP entrypoint using FastMCP:
 ```python
 """Model Context Protocol server entrypoint."""
@@ -354,13 +392,13 @@ if __name__ == "__main__":
     main()
 ```
 
-### 12. Implement CLI (`cli.py`)
+### 13. Implement CLI (`cli.py`)
 Command-line interface using Typer:
 - Mirror MCP tool parameters
 - Output JSON for easy parsing
 - Handle errors gracefully with proper exit codes
 
-### 13. Implement HTTP API (`api.py`) [Optional]
+### 14. Implement HTTP API (`api.py`) [Optional]
 FastAPI server for HTTP access:
 - Create REST endpoints that mirror MCP tools
 - Use Pydantic models for request/response validation
@@ -370,15 +408,22 @@ FastAPI server for HTTP access:
 
 ## Phase 4: Testing & Documentation
 
-### 14. Write Unit Tests
+### 15. Write Unit Tests
 Create `tests/test_{core_logic}.py`:
 - Test configuration loading with missing/invalid values
 - Test data transformation logic
 - Test error handling
 - Use pytest fixtures for common test data
 - Mock external API calls
+- **Ensure >80% code coverage**
 
-### 15. Create README.md
+Run tests with coverage:
+```bash
+pip install pytest-cov
+pytest --cov=src/{module_name} tests/
+```
+
+### 16. Create README.md
 Document the following sections:
 1. **Project description** - What the MCP server does
 2. **Requirements** - Python version, API credentials needed
@@ -389,21 +434,12 @@ Document the following sections:
 7. **MCP client registration** - Configuration examples for Claude Desktop, etc.
 8. **Environment variables** - Complete reference
 
-### 16. Create Requirement.md [Optional]
+### 17. Create Requirement.md [Optional]
 Document the original requirements, design decisions, and API research findings.
 
 ---
 
-## Phase 5: CI/CD & Publishing
-
-### 17. Create GitHub Actions Workflow (`.github/workflows/ci.yml`)
-Set up automated testing and publishing:
-- **tests job**: Run static checks, unit tests
-- **build job**: Build sdist and wheel distributions
-- **publish-testpypi job**: Publish to TestPyPI on main branch pushes
-- **publish-pypi job**: Publish to PyPI on version tags
-
-Use Trusted Publishing (OIDC) instead of API tokens for security.
+## Phase 5: Publishing
 
 ### 18. Create Publish Script (`scripts/publish.sh`)
 Local publishing script for manual releases:
@@ -415,11 +451,10 @@ python -m build
 python -m twine upload dist/*
 ```
 
-### 19. Configure PyPI Trusted Publishing
+### 19. Manual Publishing
 1. Create PyPI account and project
-2. Add GitHub Actions as trusted publisher
-3. Configure repository secrets if needed
-4. Test publishing to TestPyPI first
+2. Configure API token
+3. Run publish script: `./scripts/publish.sh`
 
 ---
 
@@ -431,7 +466,8 @@ python -m twine upload dist/*
 - [ ] CLI commands work with `.env` configuration
 - [ ] MCP server starts: `python -m {module_name}.server`
 - [ ] Unit tests pass: `pytest`
-- [ ] Static checks pass: `python -m compileall src`
+- [ ] **Test coverage is >80%**
+- [ ] **Pre-commit hooks pass**: `pre-commit run --all-files`
 
 ### 21. MCP Client Integration Testing
 Test with MCP Inspector:
@@ -456,14 +492,13 @@ Test with Claude Desktop or other MCP clients:
 - [ ] Version number updated in `pyproject.toml` and `server.json`
 - [ ] CHANGELOG created (if applicable)
 - [ ] All tests passing
-- [ ] Published to TestPyPI successfully
-- [ ] Tested installation from TestPyPI
+- [ ] Published to TestPyPI successfully (optional)
+- [ ] Tested installation from TestPyPI (optional)
 - [ ] GitHub repository created with proper description
 
 ### 24. Release
 - Tag version: `git tag v0.1.0`
 - Push tag: `git push origin v0.1.0`
-- GitHub Actions will automatically publish to PyPI
 - Create GitHub release with notes
 
 ---
@@ -500,6 +535,7 @@ Test with Claude Desktop or other MCP clients:
 - Mock external API calls
 - Test error conditions
 - Use pytest fixtures for common setup
+- **Maintain >80% coverage**
 
 ### Documentation
 - Keep README concise but complete
@@ -554,5 +590,5 @@ async def get_resource(request: FetchRequest) -> dict:
 - This workflow assumes Python 3.10+ and uses modern type hints
 - All file paths are relative to the **root directory** where workflow is invoked
 - Use web search liberally to research APIs and best practices
-- Follow the existing AdoReviewLens patterns for consistency
+- Follow the existing **AdoTaskManager** patterns for consistency
 - Adapt the structure as needed for your specific use case

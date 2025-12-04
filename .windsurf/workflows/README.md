@@ -13,7 +13,7 @@ A comprehensive 24-step workflow that guides you through creating a production-r
 - Phase-by-phase implementation guide
 - Web search integration for API research
 - Complete file templates and code examples
-- Testing and CI/CD setup
+- Testing and quality assurance setup
 - Publishing checklist
 
 **Usage**: Invoke this workflow in any directory - that directory becomes the root for your new MCP server project.
@@ -32,9 +32,10 @@ A detailed reference of 46 rules covering all aspects of MCP server development.
 - API clients (Rules 18-20)
 - MCP servers (Rules 21-23)
 - Service layer (Rules 24-25)
-- Testing (Rules 26-28)
-- Documentation (Rules 29-31)
-- CI/CD (Rules 32-34)
+- Testing (Rules 26-29)
+- Quality Assurance (Rule 30)
+- Documentation (Rules 31-33)
+- Publishing (Rule 34)
 - Package metadata (Rules 35-37)
 - Naming conventions (Rules 38-40)
 - Security (Rules 41-42)
@@ -53,17 +54,17 @@ To create a new MCP server:
 
 ## Template Reference
 
-The AdoReviewLens project serves as the reference implementation for all conventions:
+The AdoTaskManager project serves as the reference implementation for all conventions:
 
 **Key files to study**:
-- `src/ado_review_lens/server.py` - MCP server structure
-- `src/ado_review_lens/models.py` - Pydantic patterns
-- `src/ado_review_lens/errors.py` - Exception hierarchy
-- `src/ado_review_lens/config.py` - Configuration loading
-- `src/ado_review_lens/azure.py` - API client pattern
-- `src/ado_review_lens/service.py` - Business logic
-- `tests/test_resolver.py` - Testing patterns
-- `.github/workflows/ci.yml` - CI/CD setup
+- `src/ado_task_manager/server.py` - MCP server structure
+- `src/ado_task_manager/models.py` - Pydantic patterns
+- `src/ado_task_manager/errors.py` - Exception hierarchy
+- `src/ado_task_manager/config.py` - Configuration loading
+- `src/ado_task_manager/client.py` - API client pattern
+- `src/ado_task_manager/service.py` - Business logic
+- `tests/test_server.py` - Testing patterns
+- `.pre-commit-config.yaml` - Quality checks
 
 ## Important Notes
 
@@ -79,7 +80,7 @@ The AdoReviewLens project serves as the reference implementation for all convent
 2. **Project Scaffolding** - Create directories and configuration files
 3. **Core Implementation** - Build errors, models, config, client, service, server
 4. **Testing & Documentation** - Write tests, README, requirements
-5. **CI/CD & Publishing** - Set up GitHub Actions, PyPI publishing
+5. **Publishing** - Set up PyPI publishing
 6. **Validation & Launch** - Test locally, integrate with MCP clients, release
 
 ## Support

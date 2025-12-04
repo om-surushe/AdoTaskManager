@@ -10,3 +10,13 @@ __pycache__/
 .venv
 .venv_test
 .env
+
+# Build artifacts
+dist/
+build/
+*.spec
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/

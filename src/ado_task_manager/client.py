@@ -157,12 +157,23 @@ class AdoClient:
         self._handle_error(response_batch)
         return response_batch.json().get("value", [])
 
+    def get_current_user(self) -> Dict[str, Any]:
+        """Fetch the authenticated user's profile."""
+        url = f"{self.config.ado_org_url}/_apis/connectionData?api-version=7.1"
+        response = self.session.get(url)
+        self._handle_error(response)
+        return response.json().get("authenticatedUser", {})
+
     def create_task(
         self,
         project: str,
         title: str,
         description: Optional[str] = None,
         parent_id: Optional[int] = None,
+        assigned_to: Optional[str] = None,
+        original_estimate: Optional[float] = None,
+        remaining_work: Optional[float] = None,
+        completed_work: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Create a new Task."""
         url = (
@@ -178,6 +189,42 @@ class AdoClient:
                     "op": "add",
                     "path": "/fields/System.Description",
                     "value": description,
+                }
+            )
+
+        if assigned_to:
+            patch_doc.append(
+                {
+                    "op": "add",
+                    "path": "/fields/System.AssignedTo",
+                    "value": assigned_to,
+                }
+            )
+
+        if original_estimate is not None:
+            patch_doc.append(
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.OriginalEstimate",
+                    "value": original_estimate,
+                }
+            )
+
+        if remaining_work is not None:
+            patch_doc.append(
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.RemainingWork",
+                    "value": remaining_work,
+                }
+            )
+
+        if completed_work is not None:
+            patch_doc.append(
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
+                    "value": completed_work,
                 }
             )
 
@@ -203,5 +250,28 @@ class AdoClient:
             json=patch_doc,
             headers={"Content-Type": "application/json-patch+json"},
         )
+        self._handle_error(response)
+        return response.json()
+
+    def update_work_item(
+        self, id: int, operations: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Update a work item with JSON patch operations."""
+        url = f"{self.config.ado_org_url}/_apis/wit/workitems/{id}" "?api-version=7.1"
+        response = self.session.patch(
+            url,
+            json=operations,
+            headers={"Content-Type": "application/json-patch+json"},
+        )
+        self._handle_error(response)
+        return response.json()
+
+    def add_comment(self, id: int, text: str) -> Dict[str, Any]:
+        """Add a comment to a work item."""
+        url = (
+            f"{self.config.ado_org_url}/{self.config.ado_project}/"
+            f"_apis/wit/workItems/{id}/comments?api-version=7.1-preview.3"
+        )
+        response = self.session.post(url, json={"text": text})
         self._handle_error(response)
         return response.json()

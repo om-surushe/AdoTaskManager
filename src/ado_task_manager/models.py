@@ -39,3 +39,6 @@ class Task(BaseModel):
     description: Optional[str] = None
     parent_id: Optional[int] = None
     url: str
+    original_estimate: Optional[float] = None
+    remaining_work: Optional[float] = None
+    completed_work: Optional[float] = None

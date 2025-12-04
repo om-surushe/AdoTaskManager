@@ -40,8 +40,11 @@ source .venv/bin/activate
 # Fetch a task
 ado-task-manager fetch --id 123
 
-# Fetch my tasks
+# Fetch my tasks (active only)
 ado-task-manager mine
+
+# Fetch my tasks (including closed)
+ado-task-manager mine --closed
 
 # Fetch child tasks
 ado-task-manager children --id 123
@@ -84,16 +87,15 @@ The install command accepts `-v KEY=value` or `-f .env` flags if you want to sup
 
 ### Manual MCP client registration
 
-Some MCP clients accept explicit stdio configurations:
+You can use the `server` command to run the MCP server directly. This is useful when installing via PyPI.
 
 ```json
 {
   "mcpServers": {
     "ado-task-manager": {
-      "command": "python3",
+      "command": "ado-task-manager",
       "args": [
-        "-m",
-        "ado_task_manager.server"
+        "server"
       ],
       "env": {
         "AZDO_ORG_URL": "https://dev.azure.com/<org>",
@@ -106,4 +108,3 @@ Some MCP clients accept explicit stdio configurations:
 ```
 
 Merge this snippet with existing definitions as needed, then restart or refresh your client so it discovers the server.
-

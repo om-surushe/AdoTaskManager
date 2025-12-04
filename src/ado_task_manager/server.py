@@ -16,7 +16,7 @@ mcp = FastMCP("AdoTaskManager")
 def get_task_tool(id: int) -> dict:
     """
     Fetch a Task work item by its ID.
-    
+
     Args:
         id: The ID of the task to fetch.
     """
@@ -30,12 +30,16 @@ def get_task_tool(id: int) -> dict:
 
 
 @mcp.tool()
-def get_my_tasks_tool() -> List[dict]:
+def get_my_tasks_tool(include_closed: bool = False) -> List[dict]:
     """
     Fetch all Task work items assigned to the current user.
+
+    Args:
+        include_closed: If True, includes Closed, Removed, Done, Resolved.
+                        Otherwise defaults to New, Active, Committed, etc.
     """
     try:
-        tasks = get_my_tasks()
+        tasks = get_my_tasks(include_closed=include_closed)
         return [t.model_dump(by_alias=True) for t in tasks]
     except (MCPUserError, MissingConfigurationError) as exc:
         raise ValueError(str(exc)) from exc
@@ -47,7 +51,7 @@ def get_my_tasks_tool() -> List[dict]:
 def get_task_children_tool(id: int) -> List[dict]:
     """
     Fetch all child Task work items for a given parent work item ID.
-    
+
     Args:
         id: The ID of the parent work item.
     """
@@ -69,15 +73,20 @@ def create_task_tool(
 ) -> dict:
     """
     Create a new Task work item and link it to a parent.
-    
+
     Args:
         title: The title of the new task.
         parent_id: The ID of the parent work item. Mandatory.
-        project: The Azure DevOps project name. If not provided, uses configured default.
+        project: The Azure DevOps project name. If not provided, uses default.
         description: Optional description for the task.
     """
     try:
-        task = create_task(project=project or "", title=title, parent_id=parent_id, description=description)
+        task = create_task(
+            project=project or "",
+            title=title,
+            parent_id=parent_id,
+            description=description,
+        )
         return task.model_dump(by_alias=True)
     except (MCPUserError, MissingConfigurationError) as exc:
         raise ValueError(str(exc)) from exc

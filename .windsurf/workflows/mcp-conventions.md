@@ -98,10 +98,10 @@ def simple() -> str:
 def complex(param: str) -> dict:
     """
     Process the parameter and return results.
-    
+
     Args:
         param: Input parameter to process
-        
+
     Returns:
         Dictionary containing processed results
     """
@@ -124,7 +124,7 @@ class MyModel(BaseModel):
 ```python
 class ResponseModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    
+
     item_id: str = Field(alias="itemId")
     created_at: str = Field(alias="createdAt")
 ```
@@ -215,11 +215,11 @@ raise MissingConfigurationError("Missing config")
 def load_config() -> MCPConfig:
     """Load configuration from environment variables."""
     load_dotenv()
-    
+
     api_key = os.getenv("SERVICE_API_KEY")
     if not api_key:
         raise MissingConfigurationError("SERVICE_API_KEY is required")
-    
+
     return MCPConfig(api_key=api_key, ...)
 ```
 
@@ -241,10 +241,10 @@ class ServiceClient:
     def __init__(self, config: MCPConfig) -> None:
         self.config = config
         self.session = requests.Session()
-    
+
     def __enter__(self) -> "ServiceClient":
         return self
-    
+
     def __exit__(self, *args: Any) -> None:
         self.session.close()
 ```
@@ -263,13 +263,13 @@ self.session.headers.update({
 ```python
 def get_resource(self, resource_id: str) -> dict[str, Any]:
     response = self.session.get(f"{self.config.api_url}/resources/{resource_id}")
-    
+
     if not response.ok:
         raise ServiceRequestError(
             f"Failed to fetch resource: {response.text}",
             status=response.status_code,
         )
-    
+
     return response.json()
 ```
 

@@ -197,9 +197,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class MCPConfig(BaseModel):
     """Runtime configuration sourced from environment variables."""
-    
+
     model_config = ConfigDict(populate_by_name=True)
-    
+
     api_url: str
     api_key: str
     default_param: Optional[str] = None
@@ -207,9 +207,9 @@ class MCPConfig(BaseModel):
 
 class ResponseModel(BaseModel):
     """Normalized response representation returned by the MCP."""
-    
+
     model_config = ConfigDict(populate_by_name=True)
-    
+
     item_id: str = Field(alias="itemId")
     item_name: str = Field(alias="itemName")
     # Add more fields as needed
@@ -233,18 +233,18 @@ from .models import MCPConfig
 
 def load_config() -> MCPConfig:
     """Load configuration from environment variables."""
-    
+
     load_dotenv()
-    
+
     api_url = os.getenv("SERVICE_API_URL")
     api_key = os.getenv("SERVICE_API_KEY")
-    
+
     if not api_url:
         raise MissingConfigurationError("SERVICE_API_URL is required")
-    
+
     if not api_key:
         raise MissingConfigurationError("SERVICE_API_KEY is required")
-    
+
     return MCPConfig(
         api_url=api_url.rstrip("/"),
         api_key=api_key,
@@ -274,7 +274,7 @@ from .models import MCPConfig
 
 class {Service}Client:
     """HTTP client for {Service} API."""
-    
+
     def __init__(self, config: MCPConfig) -> None:
         self.config = config
         self.session = requests.Session()
@@ -282,24 +282,24 @@ class {Service}Client:
             "Authorization": f"Bearer {config.api_key}",
             "Content-Type": "application/json",
         })
-    
+
     def __enter__(self) -> "{Service}Client":
         return self
-    
+
     def __exit__(self, *args: Any) -> None:
         self.session.close()
-    
+
     def get_resource(self, resource_id: str) -> Dict[str, Any]:
         """Fetch a resource from the API."""
         url = f"{self.config.api_url}/resources/{resource_id}"
         response = self.session.get(url)
-        
+
         if not response.ok:
             raise {Service}RequestError(
                 f"Failed to fetch resource: {response.text}",
                 status=response.status_code,
             )
-        
+
         return response.json()
 ```
 
@@ -333,7 +333,7 @@ def tool_name(
     param2: Optional[int] = None,
 ) -> dict:
     """Tool description that will appear in MCP clients."""
-    
+
     try:
         response = fetch_data(param1=param1, param2=param2)
         return response.model_dump(by_alias=True)

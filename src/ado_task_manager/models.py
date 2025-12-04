@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from typing import Optional, Any
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class MCPConfig(BaseModel):
     """Runtime configuration sourced from environment variables."""
-    
+
     model_config = ConfigDict(populate_by_name=True)
-    
+
     ado_org_url: str
     ado_pat: str
     ado_project: Optional[str] = None
@@ -18,9 +18,9 @@ class MCPConfig(BaseModel):
 
 class WorkItem(BaseModel):
     """Azure DevOps Work Item."""
-    
+
     model_config = ConfigDict(populate_by_name=True)
-    
+
     id: int
     rev: int
     fields: dict[str, Any]
@@ -29,9 +29,9 @@ class WorkItem(BaseModel):
 
 class Task(BaseModel):
     """Task work item model."""
-    
+
     model_config = ConfigDict(populate_by_name=True)
-    
+
     id: int
     title: str
     state: str

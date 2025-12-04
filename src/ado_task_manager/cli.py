@@ -7,7 +7,6 @@ from typing import Optional
 import typer
 
 from .service import get_task, get_my_tasks, get_task_children, create_task
-from .errors import MCPUserError, AdoRequestError, MissingConfigurationError
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -24,10 +23,20 @@ def fetch(id: int):
 
 
 @app.command()
-def mine():
+def server():
+    """Run the MCP server."""
+    from .server import main as server_main
+
+    server_main()
+
+
+@app.command()
+def mine(
+    closed: bool = typer.Option(False, "--closed", help="Include closed/inactive tasks")
+):
     """Fetch tasks assigned to me."""
     try:
-        tasks = get_my_tasks()
+        tasks = get_my_tasks(include_closed=closed)
         print(json.dumps([t.model_dump(by_alias=True) for t in tasks], indent=2))
     except Exception as e:
         print(f"Error: {e}")
@@ -54,7 +63,12 @@ def create(
 ):
     """Create a new task."""
     try:
-        task = create_task(project=project or "", title=title, parent_id=parent_id, description=description)
+        task = create_task(
+            project=project or "",
+            title=title,
+            parent_id=parent_id,
+            description=description,
+        )
         print(json.dumps(task.model_dump(by_alias=True), indent=2))
     except Exception as e:
         print(f"Error: {e}")
